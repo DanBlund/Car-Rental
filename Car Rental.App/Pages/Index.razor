@@ -1,0 +1,120 @@
+﻿@page "/"
+@using Car_Rental.Business.Classes;
+@* Injeserar en instans av BookingProcessor klassen som heter bookProc *@
+@inject BookingProcessor bookProc
+
+<h3>Vehicles</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Reg #</th>
+            <th scope="col">Make</th>
+            <th scope="col">Vehicle type</th>
+            <th scope="col">Odometer</th>
+            <th scope="col">Kost / km</th>
+            <th scope="col">Kost / day</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vehicle in bookProc.VehicleGetter())
+        {
+            <tr>
+                <th scope="row">@vehicle.RegNumber</th>
+                <td>@vehicle.Make</td>
+                <td>@vehicle.VehicleType</td>
+                <td>@vehicle.Odometer</td>
+                <td>@vehicle.CostPerKm</td>
+                <td>@vehicle.CostPerDay</td>
+                <td>
+                    @if (vehicle.Status == true)
+                    {
+                        <td class="text-success">Available</td>
+                    }
+                    else
+                    {
+                        <td class="text-danger">Booked</td>
+                    }
+                </td>
+            </tr>                                        
+        }
+    </tbody>
+</table>
+<br />
+
+<h3>Customers</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">SSN</th>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in bookProc.CustomerGetter())
+        {   
+            <tr>
+                <th scope="row">@customer.Ssn</th>
+                <td>@customer.FirstName</td>
+                <td>@customer.LastName</td>
+            </tr>           
+        }
+    </tbody>
+</table>
+<br />
+
+<h3>Bookings</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Reg #</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Km Rented</th>
+            <th scope="col">Km Returned</th>
+            <th scope="col">Date Rented</th>
+            <th scope="col">Date Returned</th>
+            <th scope="col">Cost</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in bookProc.BookingGetter())
+        {
+            <tr>
+                <th scope="row">@book.RegNumber</th>
+                <td>@book.Customer</td>
+                <td>@book.KmRented</td>
+                @if (book.Status == false)
+                {
+                    <td>-</td>
+                }
+                else
+                {                    
+                <td>@book.KmReturned</td>
+                }
+                <td>@book.Rented.ToString("MM/dd/yyyy")</td>
+                @if (book.Status == false)
+                {
+                    <td>-</td>
+                    <td>-</td>
+                }
+                else
+                {
+
+                    <td>@book.Returned.ToString("MM/dd/yyyy")</td>
+                    <td>@bookProc.CalculateCost(book.RegNumber, book.KmRented, book.KmReturned, book.Rented, book.Returned)</td>
+                }
+                @if (book.Status == true)
+                {
+                    <td class="text-success">Returned</td>
+                }
+                else
+                {
+                    <td class="text-danger">Open</td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
